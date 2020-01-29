@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenva.VR;
 
 public class PlayerRpgController : MonoBehaviour {
 
@@ -22,7 +23,7 @@ public class PlayerRpgController : MonoBehaviour {
     PlayerCollectableCtrl playerCollectableCtr;
 
     // player free teleport controller
-    PlayerFreeTeleportController playerFreeTeleportCtrl;
+    FreeTeleportController playerFreeTeleportCtrl;
 
     // animator for the attacks
     Animator anim;
@@ -30,10 +31,12 @@ public class PlayerRpgController : MonoBehaviour {
     // current weapon
     GameObject currWeapon;
 
+    public GameObject[] disableOnWeaponPickup;
+
     void Awake()
     {
         playerCollectableCtr = GetComponent<PlayerCollectableCtrl>();
-        playerFreeTeleportCtrl = GetComponent<PlayerFreeTeleportController>();
+        playerFreeTeleportCtrl = GetComponent<FreeTeleportController>();
 
         // get animator from the hand
         anim = weaponHand.GetComponent<Animator>();
@@ -99,12 +102,18 @@ public class PlayerRpgController : MonoBehaviour {
 
         // keep track of the new weapon
         currWeapon = item;
+
+        // disable objects when we pickup weapon
+        foreach(GameObject obj in disableOnWeaponPickup)
+        {
+            obj.SetActive(false);
+        }
     }
 
     void Update()
     {
         // check if we have a weapon
-        if(currWeapon != null && !playerCollectableCtr.IsSelecting() && !playerFreeTeleportCtrl.IsSelecting())
+        if(currWeapon != null && !playerCollectableCtr.IsSelecting())
         {
             // check user input
             if(Input.GetButtonDown("Fire1"))

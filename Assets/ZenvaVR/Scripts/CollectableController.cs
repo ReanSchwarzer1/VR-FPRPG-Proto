@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using VRStandardAssets.Utils;
+using Zenva.VR;
 
-[RequireComponent(typeof(VRInteractiveItem))]
+[RequireComponent(typeof(Interactable))]
 public class CollectableController : MonoBehaviour {
 
     // is the item consumable? (it will be destroyed after collecting)
@@ -21,17 +21,13 @@ public class CollectableController : MonoBehaviour {
     // flexible array of properties
     public ItemStat[] properties;
 
-    // vr interactive item
-    VRInteractiveItem vrItem;
-
     // player collectable ctrl
     PlayerCollectableCtrl playerCollect;
 
+    bool isOver;
+
     void Awake()
     {
-        // get the vr interactive item component
-        vrItem = GetComponent<VRInteractiveItem>();
-
         // get the PlayerCollectableCtr object
         playerCollect = FindObjectOfType<PlayerCollectableCtrl>();
 
@@ -41,23 +37,7 @@ public class CollectableController : MonoBehaviour {
         }
     }
 
-    void OnEnable()
-    {
-        // subscribe to events
-        vrItem.OnOver += HandleOver;
-        vrItem.OnOut += HandleOut;
-        vrItem.OnClick += HandleClick;
-    }
-
-    void OnDisable()
-    {
-        // unsubscribe to events
-        vrItem.OnOver -= HandleOver;
-        vrItem.OnOut -= HandleOut;
-        vrItem.OnClick -= HandleClick;
-    }
-
-    void HandleClick()
+    public void HandleClick()
     {
         if (Vector3.Distance(transform.position, playerCollect.gameObject.transform.position) <= playerCollect.maxDistance)
         {
@@ -69,8 +49,10 @@ public class CollectableController : MonoBehaviour {
         }
     }
 
-    void HandleOut()
+    public void HandleOut()
     {
+        isOver = false;
+
         //the player collectable ctr knows we are looking away
         playerCollect.SelectionOut();
 
@@ -78,10 +60,12 @@ public class CollectableController : MonoBehaviour {
         Highlight(false);
     }
 
-    void HandleOver()
+    public void HandleOver()
     {
         if(Vector3.Distance(transform.position, playerCollect.gameObject.transform.position) <= playerCollect.maxDistance)
         {
+            isOver = true;
+
             //the player collectable ctr knows we are selecting
             playerCollect.SelectionOver();
 
@@ -118,7 +102,7 @@ public class CollectableController : MonoBehaviour {
         // fix for when swapping items
         // if we are looking at the item, and if the player collect ctr is not "selecting"
         // we need to force selection
-        if(vrItem.IsOver && !playerCollect.IsSelecting())
+        if(isOver == true && !playerCollect.IsSelecting())
         {
             HandleOver();
         }
