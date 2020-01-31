@@ -7,7 +7,7 @@ public class WeaponController : MonoBehaviour {
 
     
     bool isReady = false;
-
+    float CD = 2f;
     CollectableController collectable;
 
     public void SetReady(bool value)
@@ -36,6 +36,12 @@ public class WeaponController : MonoBehaviour {
 
             // only hit once per swing
             isReady = false;
+            Invoke(nameof(ResetCD), CD);
         }
+    }
+
+    void ResetCD()
+    {
+        isReady = true;
     }
 }
